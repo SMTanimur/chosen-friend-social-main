@@ -11,7 +11,7 @@ export class ServerConfig {
   public static readonly NX_MONGODB_URI: string = get('NX_MONGODB_URI')
     .required()
     .asString();
-  public static readonly NX_JWT_SECRET_KEY: string = get('JWT_SECRET_KEY')
+  public static readonly NX_SESSION_SECRET: string = get('SESSION_SECRET')
     .required()
     .asString();
   public static readonly NX_CLIENT_URL: string = get('NX_CLIENT_URL')

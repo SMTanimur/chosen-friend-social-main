@@ -1,38 +1,62 @@
-/*
-https://docs.nestjs.com/controllers#controllers
-*/
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Post,
+  Req,
+  Request,
+  Res,
+  Response,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
-import { Controller, Get, HttpCode, Post,Request,UseGuards } from '@nestjs/common';
-import { ApiAcceptedResponse, ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiInternalServerErrorResponse, ApiTags } from '@nestjs/swagger';
-import { BadRequestDto, InternalServerErrorExceptionDto } from '../swagger/swangger.dto';
+import { LocalAuthGuard } from './guards/local.auth.guard';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { LocalAuthGuard } from './guards/local-auth.guard';
-import { LoginResponeDto, LoginUserDto } from './swagger/Login.dto';
-@ApiTags('auth')
-@ApiInternalServerErrorResponse({
-  type: InternalServerErrorExceptionDto,
-  description: 'Server error',
-})
+import { LoginRequestDto } from './dto/login.user.dto';
+import { UserService } from '../users/user.service';
+import { AuthenticatedGuard } from './guards/authenticated.guard';
+import { ServerConfig } from '../../configs/server.config';
+
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor( private readonly authService:AuthService){}
-   // LOGIN
-   @UseGuards(LocalAuthGuard)
-   @ApiBody({ type: LoginUserDto, description: 'Enter your email and password' })
-   @ApiAcceptedResponse({
-     type: LoginResponeDto,
-     description: 'Login success',
-   })
-   @ApiBadRequestResponse({
-     type: BadRequestDto,
-     description:
-       'Email, password wrong, email field, password field not empty ',
-   })
-   @HttpCode(202)
-   @Post('login')
-   async login(@Request() req) {
-     return this.authService.login(req.user);
-   }
- 
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService
+  ) {}
+
+  @UseGuards(LocalAuthGuard)
+  @ApiOperation({ summary: 'Login user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Logged in successfully.',
+  })
+  @Post('login')
+  @HttpCode(200)
+  async login(@Request() req: any, @Body() _loginRequestDto: LoginRequestDto) {
+    return req.user;
+  }
+
+
+  @ApiOperation({ summary: 'user' })
+  @ApiOkResponse({
+    description: 'Logout successfully.',
+  })
+  @Delete('logout')
+  async logout(@Req() req, @Res() res) {
+    await req.session.destroy(() => null);
+    await res.clearCookie('twitter_sid');
+    await req.logout(() => null);
+    return res.status(200).json({ message: 'Logged out successfully' });
+  }
 }
