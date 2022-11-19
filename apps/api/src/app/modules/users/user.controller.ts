@@ -1,14 +1,37 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
 
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiConflictResponse, ApiCreatedResponse, ApiInternalServerErrorResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { BadRequestDto, ConFlictExceptionDto, InternalServerErrorExceptionDto, UnauthorizedExceptionDto } from '../swagger/swangger.dto';
-import { CreateUserDto } from './dto';
+import {
+  BadRequestDto,
+  ConFlictExceptionDto,
+  InternalServerErrorExceptionDto,
+  UnauthorizedExceptionDto,
+} from '../swagger/swangger.dto';
+import { CreateUserDto, UpdateUserDto } from './dto';
+import { UserDocument } from './entities';
 import { UserService } from './user.service';
 
-@ApiBearerAuth()
 @ApiTags('users')
 @ApiInternalServerErrorResponse({
   type: InternalServerErrorExceptionDto,
@@ -20,11 +43,11 @@ import { UserService } from './user.service';
 })
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService:UserService){}
+  constructor(private readonly userService: UserService) {}
 
-    // REGISTER
+  // REGISTER
   @ApiCreatedResponse({
-    type: "",
+    type: '',
     description: 'Register success',
   })
   @ApiBadRequestResponse({
@@ -36,20 +59,30 @@ export class UserController {
     type: ConFlictExceptionDto,
     description: 'Email already exist',
   })
-
   @Post('register')
   async create(@Body() createUserDto: CreateUserDto) {
     return await this.userService.regisrer(createUserDto);
   }
 
-  
-  @UseGuards(JwtAuthGuard)
-  @Get('profile')
- async getProfile(@Req() req: any) {
-    const user= await this.userService.findUserById(req.user.id)
-    return user
+  @UseGuards(AuthenticatedGuard)
+  @Get('me')
+  async getProfile(@Req() req: any) {
+    const user = await this.userService.findUserByUserName(req.user.username);
+    return user;
   }
 
-  
-
+  @ApiOperation({
+    summary: 'Edit User Profile',
+    description: 'User Can edit his profile with her own data',
+  })
+  @ApiResponse({status:200,description:'user successfully updated'})
+   @HttpCode(200)
+  @UseGuards(AuthenticatedGuard)
+  @Patch('edit')
+  async updateProfile(
+    @Req() req: { user: UserDocument },
+    @Body() updateUserDto: UpdateUserDto
+  ) {
+    return await this.userService.userProfileEdit(req.user._id, updateUserDto);
+  }
 }

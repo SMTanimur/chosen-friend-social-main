@@ -1,12 +1,21 @@
+import { withAuth } from "@HOC/withAuth";
+import { GetServerSideProps } from "next";
+import AppLayout from "src/layout/AppLayout";
 
 
-export function Index() {
- 
+
+export function HomePage() {
+
   return (
-    <div className="bg-green-500">
-     <h1>Hello</h1>
-    </div>
+    <AppLayout className="">
+     <h1>hello world</h1>
+    </AppLayout>
   );
 }
+export const getServerSideProps: GetServerSideProps = withAuth(async () => {
+  return {
+    props: {},
+  };
+});
+export default HomePage
 
-export default Index;

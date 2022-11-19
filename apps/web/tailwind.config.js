@@ -9,33 +9,26 @@ module.exports = {
     ...createGlobPatternsForDependencies(__dirname),
   ],
   theme: {
-    screens: {
-      sm: '640px',
-      // => @media (min-width: 640px) { ... }
-
-      md: '768px',
-      // => @media (min-width: 768px) { ... }
-
-      lg: '1024px',
-      // => @media (min-width: 1024px) { ... }
-
-      xl: '1280px',
-      // => @media (min-width: 1280px) { ... }
-
-      '2xl': '1536px',
-      // => @media (min-width: 1536px) { ... }
-    },
-
-    container: {
-      center: true,
-      padding: '1.5rem',
-    },
     extend: {
       colors: {
-        red_primary: '#ff014f',
-        blue_primary: '#0f3460',
+        black33: "#333333",
+        redff4: "#ff424e",
+        orangeee4: "#ee4d2d",
+        gray999: "#999",
+        blue08f: "#08f",
+        green00b: "#00bfa5",
       },
-      fontFamily: {},
+      fontFamily: {
+        dm: ['"DM Sans"', " sans-serif"],
+      },
+      backgroundImage: {
+        linearfef5: "linear-gradient(0, #fe6433, #f53e2d)",
+        linearOrange: "linear-gradient(-180deg,#f53d2d,#f63)",
+      },
+      screens: {
+        max5se: { max: "320.98px" },
+        maxsm: { max: "768.98px" },
+      },
     },
   },
   plugins: [],

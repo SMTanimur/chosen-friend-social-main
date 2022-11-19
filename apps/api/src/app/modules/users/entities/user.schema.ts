@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import * as bcrypt from 'bcrypt';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
@@ -14,25 +15,31 @@ export class User {
   @Prop({ required: true, trim: true })
   password: string;
 
-  @Prop({ type: mongoose.Types.ObjectId, ref: 'User' })
-  following: mongoose.Types.ObjectId;
+  @Prop({ type: mongoose.Types.ObjectId, ref: 'User',autopopulate: true, })
+  following: []
 
-  @Prop({ type: mongoose.Types.ObjectId, ref: 'User' })
-  follower: mongoose.Types.ObjectId;
+  @Prop({type:'array',maxLength:200})
+  posts:[]
+
+  @Prop({ type: mongoose.Types.ObjectId, ref: 'User'})
+  followers: []
+
   @Prop({ type: 'string', maxlength: 200 })
-  story: string;
+  bio: string;
+
+  @Prop({type: mongoose.Types.ObjectId, ref: 'User',autopopulate: true,})
+  likes:[]
   @Prop({
     default:
       'https://res.cloudinary.com/dk6bdrkbv/image/upload/v1658841812/mushfiqTanim/user_qcrqny_kcgfes.svg',
   })
   avatar: string;
 
-  @Prop({ type: 'string', default: 'male' })
-  gender: string;
-
-  @Prop({ required: false })
-  userName?: string;
-
+  @Prop()
+  banner:string
+  
+  @Prop({ required: true, unique: true })
+  username: string;
   @Prop({
     enum: ['admin', 'user'],
     default: 'user',
@@ -45,7 +52,7 @@ export interface UserDocument extends User, mongoose.Document {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
-
+UserSchema.plugin(require('mongoose-autopopulate'));
 UserSchema.methods.comparePassword = async function (
   password: string
 ): Promise<boolean> {

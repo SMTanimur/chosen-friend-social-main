@@ -16,7 +16,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty()
-  readonly userName: string;
+  readonly username: string;
 
   @IsNotEmpty()
   @IsEmail()
@@ -26,12 +26,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
-  @ApiProperty({default:"male"})
-  readonly gender: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @MinLength(8,{message:'password should be min 8 character'})
+  @MinLength(8, { message: 'password should be min 8 character' })
   @ApiProperty()
   password: string;
 }
